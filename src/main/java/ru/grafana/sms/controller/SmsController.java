@@ -22,8 +22,8 @@ public class SmsController {
     private GrafanaSmsConfig grafanaSmsConfig;
 
     @PostMapping("/")
-    public ResponseEntity create(@RequestBody Map<String, Object> req) {
-        new ProcessingRequest(grafanaSmsConfig,req).templating();
+    public ResponseEntity create(@RequestBody Grafana grafana) {
+        new ProcessingRequest(grafanaSmsConfig, grafana).templating();
         return ResponseEntity.ok(HttpStatus.OK);
     }
 }

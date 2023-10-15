@@ -1,6 +1,8 @@
 package ru.grafana.sms.service
 
+import groovy.json.JsonSlurper
 import groovy.text.GStringTemplateEngine
+import groovy.json.JsonOutput
 import lombok.AccessLevel
 import lombok.AllArgsConstructor
 import lombok.Data
@@ -14,9 +16,9 @@ import ru.grafana.sms.model.Grafana
 class ProcessingRequest {
 
     GrafanaSmsConfig grafanaSmsConfig
-    Map<String, Object> grafana
+    Grafana grafana
 
-    ProcessingRequest(GrafanaSmsConfig grafanaSmsConfig, Map<String, Object> grafana) {
+    ProcessingRequest(GrafanaSmsConfig grafanaSmsConfig, Grafana grafana) {
         this.grafanaSmsConfig = grafanaSmsConfig
         this.grafana = grafana
     }
@@ -29,22 +31,23 @@ class ProcessingRequest {
         this.grafanaSmsConfig = grafanaSmsConfig
     }
 
-    Map<String, Object> getGrafana() {
+    Grafana getGrafana() {
         return grafana
     }
 
-    void setGrafana(Map<String, Object> grafana) {
+    void setGrafana(Grafana grafana) {
         this.grafana = grafana
     }
 
     void templating() {
         def engine = new GStringTemplateEngine()
-        def tpl = [] as String[]
+        def jsonSlurper = new JsonSlurper()
+        def json = jsonSlurper.parseText(JsonOutput.toJson(grafana)) as Map
 
         grafanaSmsConfig.smsGate.each {
             gate -> {
-                def f = new File(gate.getTemplatePath())
-                System.out.println(engine.createTemplate(f).make(grafana).toString())
+                def f = "${new File(gate.getTemplatePath()).getText('UTF-8')}"
+                System.out.println(engine.createTemplate(f).make(json).toString())
 //                tpl.add(engine.createTemplate(f).make(grafana as Map).toString())
             }
         }
