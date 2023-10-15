@@ -1,0 +1,6 @@
+sms-sender:
+  sms-gate:
+    - template-path: "D:\\java\\grafana-sms\\src\\main\\resources\\templates\\tmpl.template"
+
+server:
+  port: 8080
